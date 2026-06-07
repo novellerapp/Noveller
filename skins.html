@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noveller · Custom Skin Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #1a1410;
+    --paper:     #f5f0e8;
+    --cream:     #ede7d6;
+    --amber:     #c8873a;
+    --amber-dim: #a36a25;
+    --rust:      #8b3a2f;
+    --sage:      #4a6741;
+    --slate:     #3d4a5c;
+    --muted:     #7a6e5f;
+    --rule:      rgba(26,20,16,0.12);
+    --code-bg:   #2a2118;
+    --code-text: #e8d9bc;
+    --code-key:  #f0a855;
+    --code-str:  #89c775;
+    --code-type: #7fb3d9;
+    --code-cmt:  #7a6e5f;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--cream);
+    border-right: 1px solid var(--rule);
+    padding: 2rem 0 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .nav-brand {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1rem;
+  }
+
+  .nav-brand .wordmark {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+  }
+
+  .nav-brand .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-section-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.75rem 1.5rem 0.25rem;
+  }
+
+  nav a {
+    display: block;
+    padding: 0.3rem 1.5rem;
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  nav a:hover {
+    color: var(--amber);
+    border-left-color: var(--amber);
+    background: rgba(200,135,58,0.06);
+  }
+
+  nav a.active {
+    color: var(--amber-dim);
+    border-left-color: var(--amber-dim);
+    font-weight: 600;
+  }
+
+  nav a.sub {
+    padding-left: 2.25rem;
+    font-size: 0.77rem;
+  }
+
+  /* ── MAIN ── */
+  main {
+    padding: 0;
+    max-width: 820px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 4rem 3.5rem 3rem;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '⟨ .skin ⟩';
+    position: absolute;
+    right: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 4.5rem;
+    color: var(--rule);
+    letter-spacing: -0.04em;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber-dim);
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 480px;
+    line-height: 1.8;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content { padding: 0 3.5rem 5rem; }
+
+  section { padding-top: 3rem; }
+
+  section + section { border-top: 1px solid var(--rule); }
+
+  h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  h2 .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    background: rgba(200,135,58,0.1);
+    padding: 0.15em 0.5em;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.5rem;
+  }
+
+  p { color: #3d3228; margin-bottom: 0.75rem; }
+
+  ul, ol {
+    padding-left: 1.4rem;
+    margin-bottom: 0.75rem;
+    color: #3d3228;
+  }
+
+  li { margin-bottom: 0.25rem; }
+
+  strong { color: var(--ink); font-weight: 700; }
+
+  em { font-style: italic; color: var(--amber-dim); }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 1.25rem 1.4rem;
+    margin: 0.75rem 0 1rem;
+    overflow-x: auto;
+    border: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+
+  pre .lang-tag {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a3f2f;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--code-text);
+  }
+
+  :not(pre) > code {
+    background: rgba(200,135,58,0.12);
+    color: var(--amber-dim);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.8em;
+  }
+
+  .kw  { color: var(--code-key); }
+  .str { color: var(--code-str); }
+  .typ { color: var(--code-type); }
+  .cmt { color: var(--code-cmt); font-style: italic; }
+  .pun { color: #c8a06a; }
+
+  /* ── TOKEN GRID ── */
+  .token-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+    margin: 1rem 0;
+  }
+
+  .token-card {
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .token-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--amber);
+  }
+
+  .token-card.green::before  { background: var(--sage); }
+  .token-card.slate::before  { background: var(--slate); }
+  .token-card.rust::before   { background: var(--rust); }
+
+  .token-card .token-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--amber-dim);
+    margin-bottom: 0.15rem;
+  }
+  .token-card.green .token-key { color: var(--sage); }
+  .token-card.slate .token-key { color: var(--slate); }
+  .token-card.rust  .token-key { color: var(--rust); }
+
+  .token-card .token-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-left: 3px solid var(--amber);
+    background: rgba(200,135,58,0.07);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 4px 4px 0;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+    color: #3d3228;
+  }
+
+  .callout.warn {
+    border-left-color: var(--rust);
+    background: rgba(139,58,47,0.06);
+  }
+
+  .callout.tip {
+    border-left-color: var(--sage);
+    background: rgba(74,103,65,0.06);
+  }
+
+  .callout strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .callout.warn strong { color: var(--rust); }
+  .callout.tip  strong { color: var(--sage); }
+  .callout strong:not(.callout.warn strong):not(.callout.tip strong) { color: var(--amber-dim); }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(26,20,16,0.07);
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--amber-dim);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:nth-child(even) td { background: rgba(237,231,214,0.5); }
+
+  /* ── BACK TO TOP ── */
+  .back-top {
+    display: inline-block;
+    margin-top: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+
+  .back-top:hover { color: var(--amber); }
+
+  /* ── SCROLLBAR ── */
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+  /* ── ACTIVE NAV ── */
+  section { scroll-margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ─── SIDEBAR ─── -->
+  <nav id="sidebar">
+    <div class="nav-brand">
+      <span class="wordmark">Noveller</span>
+      <span class="subtitle">.skin Custom Theme Guide</span>
+    </div>
+
+    <span class="nav-section-label">Basics</span>
+    <a href="#overview">What Is a Skin?</a>
+    <a href="#file-location">File &amp; Location</a>
+    <a href="#file-format">File Format</a>
+    <a href="#metadata">Metadata Fields</a>
+    <a href="#color-values">Color Values</a>
+
+    <span class="nav-section-label">Color Tokens</span>
+    <a href="#surface">Surface &amp; Chrome</a>
+    <a href="#text">Text</a>
+    <a href="#accent">Accent</a>
+    <a href="#buttons">Buttons</a>
+    <a href="#inputs">Inputs &amp; Sliders</a>
+    <a href="#editor">Editor</a>
+    <a href="#cards">Cards, Pills &amp; Adorners</a>
+    <a href="#scrollbars">Scrollbars</a>
+    <a href="#shadow">Drop Shadow</a>
+    <a href="#misc">Misc</a>
+
+    <span class="nav-section-label">Reference</span>
+    <a href="#minimal-example">Minimal Example</a>
+    <a href="#full-example">Full Example</a>
+    <a href="#quick-ref">All Tokens</a>
+  </nav>
+
+  <!-- ─── MAIN ─── -->
+  <main>
+    <div class="hero" id="top">
+      <span class="hero-tag">Noveller · Skin System</span>
+      <h1>Creating <em>Custom</em><br>Skins</h1>
+      <p>A complete guide to <code>.skin</code> files — file format, the full color token reference, and a worked example from minimal to complete.</p>
+    </div>
+
+    <div class="content">
+
+      <!-- ─── OVERVIEW ─── -->
+      <section id="overview">
+        <h2><span class="section-num">01</span> What Is a Skin?</h2>
+        <p>A skin is a JSON file that remaps every color in Noveller's UI. When Noveller loads a skin it reads your color definitions, converts them into brushes, and merges them into the application's resource dictionary — replacing the built-in theme without any code changes required.</p>
+        <p>Skins live alongside Noveller's built-in themes and can be selected from the same theme picker. Any file you drop into the Skins folder is discovered automatically the next time the picker opens.</p>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          You only need to define the colors you want to override. Any token you omit falls back to <code>Colors.Black</code> (or <code>Colors.Transparent</code> for scrollbar backgrounds), so start minimal and add tokens until the UI looks right.
+        </div>
+      </section>
+
+      <!-- ─── FILE & LOCATION ─── -->
+      <section id="file-location">
+        <h2><span class="section-num">02</span> File &amp; Location</h2>
+        <p>Skin files use the <code>.skin</code> extension and must be placed in the Noveller Skins folder inside your Documents directory.</p>
+
+        <pre><code>Documents/
+  Noveller/
+    Skins/
+      MidnightInk.skin        <span class="cmt">← appears in the theme picker</span>
+      WarmParchment.skin
+      CoolSlate.skin
+</code><span class="lang-tag">folder</span></pre>
+
+        <p>The name shown in Noveller's theme picker is the <strong>filename</strong> without its extension — not the <code>name</code> field inside the JSON. <strong>MidnightInk.skin</strong> always appears as <em>MidnightInk</em> in the picker regardless of what you write in the file's <code>name</code> field.</p>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          The Skins folder is created automatically the first time Noveller scans for custom themes, so you don't need to create it manually.
+        </div>
+      </section>
+
+      <!-- ─── FILE FORMAT ─── -->
+      <section id="file-format">
+        <h2><span class="section-num">03</span> File Format</h2>
+        <p>A skin file is valid JSON with a single top-level object containing a <code>Colors</code> dictionary. Each key is a color token name and each value is a color string.</p>
+
+        <pre><code><span class="pun">{</span>
+  <span class="str">"Colors"</span><span class="pun">: {</span>
+    <span class="str">"Surface.Background"</span><span class="pun">:</span> <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Surface.Border"</span><span class="pun">:</span>     <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Text"</span><span class="pun">:</span>               <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Accent"</span><span class="pun">:</span>             <span class="typ">"#cba6f7"</span>
+  <span class="pun">}</span>
+<span class="pun">}</span>
+</code><span class="lang-tag">.skin</span></pre>
+
+        <ul>
+          <li>The file must be valid JSON. Comments are <strong>supported</strong> — the parser explicitly ignores JSON comment syntax.</li>
+          <li>The <code>Colors</code> object must have at least one entry or the skin is rejected silently.</li>
+          <li>Keys are case-sensitive. <code>Surface.Background</code> is valid; <code>surface.background</code> is not recognised.</li>
+          <li>An unrecognised key is ignored. A bad color value logs a debug warning and is skipped.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Note — Color. prefix</strong>
+          Keys may be written with or without a leading <code>Color.</code> prefix — both are equivalent. <code>"Surface.Background"</code> and <code>"Color.Surface.Background"</code> resolve to the same token. Prefer the shorter form without the prefix.
+        </div>
+      </section>
+
+      <!-- ─── METADATA ─── -->
+      <section id="metadata">
+        <h2><span class="section-num">04</span> Metadata Fields</h2>
+        <p>Alongside <code>Colors</code>, a skin file can carry four optional metadata fields at the top level. None of them affect how colors are loaded — they exist for display and tooling purposes.</p>
+
+        <pre><code><span class="pun">{</span>
+  <span class="str">"name"</span><span class="pun">:</span>        <span class="typ">"Midnight Ink"</span><span class="pun">,</span>
+  <span class="str">"author"</span><span class="pun">:</span>      <span class="typ">"Jane Doe"</span><span class="pun">,</span>
+  <span class="str">"description"</span><span class="pun">:</span> <span class="typ">"A deep dark theme with violet accents."</span><span class="pun">,</span>
+  <span class="str">"isDark"</span><span class="pun">:</span>      <span class="typ">true</span><span class="pun">,</span>
+  <span class="str">"Colors"</span><span class="pun">: {</span>
+    <span class="cmt">// ...</span>
+  <span class="pun">}</span>
+<span class="pun">}</span>
+</code><span class="lang-tag">.skin</span></pre>
+
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Purpose</th></tr>
+          <tr><td>name</td><td>string</td><td>Human-readable display name. <strong>Not</strong> used by the theme picker — the picker always shows the filename without extension.</td></tr>
+          <tr><td>author</td><td>string</td><td>Credit for the skin creator. Shown in skin metadata UI where supported.</td></tr>
+          <tr><td>description</td><td>string</td><td>A short summary of the skin's style or intent.</td></tr>
+          <tr><td>isDark</td><td>boolean</td><td>Hints to the UI that this is a dark theme. Used for thumbnail previews and other display decisions — the loader itself does not read this value.</td></tr>
+        </table>
+
+        <div class="callout warn">
+          <strong>Warning — Picker Name</strong>
+          Renaming a skin in the picker requires renaming the <code>.skin</code> file itself. Changing the <code>"name"</code> field inside the JSON has no effect on the dropdown label.
+        </div>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          Even though <code>isDark</code> doesn't change how colors load, it's worth setting correctly. Noveller can use it to render an appropriate preview swatch in the theme picker, so users can tell at a glance whether a skin is light or dark before applying it.
+        </div>
+      </section>
+
+      <!-- ─── COLOR VALUES ─── -->
+      <section id="color-values">
+        <h2><span class="section-num">05</span> Color Values</h2>
+        <p>Any string that WPF's <code>ColorConverter</code> can parse is accepted. In practice that means hex notation and named colors.</p>
+
+        <table>
+          <tr><th>Format</th><th>Example</th><th>Notes</th></tr>
+          <tr><td>#RRGGBB</td><td>#1e1e2e</td><td>Six-digit hex, most common</td></tr>
+          <tr><td>#AARRGGBB</td><td>#cc1e1e2e</td><td>Eight-digit hex with alpha channel</td></tr>
+          <tr><td>#RGB</td><td>#1e2</td><td>Three-digit shorthand, no alpha</td></tr>
+          <tr><td>Named color</td><td>Transparent, Black, White</td><td>Any WPF/X11 named color</td></tr>
+        </table>
+
+        <div class="callout warn">
+          <strong>Warning — Alpha &amp; Scrollbars</strong>
+          Alpha values in hex colors work everywhere <em>except</em> the four scrollbar tokens, which have their opacity set programmatically and will ignore any alpha you provide. For scrollbars, use an opaque color and let Noveller apply the opacity.
+        </div>
+      </section>
+
+      <!-- ─── SURFACE ─── -->
+      <section id="surface">
+        <h2><span class="section-num">06</span> Surface &amp; Chrome</h2>
+        <p>Surface tokens control the backgrounds, borders, and chrome elements that make up the main window shell.</p>
+
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Surface.Background</div><div class="token-desc">Main application background</div></div>
+          <div class="token-card"><div class="token-key">Surface.Offset</div><div class="token-desc">Slightly raised panels and sidebars</div></div>
+          <div class="token-card"><div class="token-key">Surface.Offset.Hover</div><div class="token-desc">Hover state for offset surfaces</div></div>
+          <div class="token-card"><div class="token-key">Surface.Border</div><div class="token-desc">Primary border / divider color</div></div>
+          <div class="token-card"><div class="token-key">Surface.Border.Light</div><div class="token-desc">Subtle / secondary border</div></div>
+          <div class="token-card"><div class="token-key">Surface.TitleBar</div><div class="token-desc">Custom title bar background</div></div>
+          <div class="token-card"><div class="token-key">Surface.TitleBar.Text</div><div class="token-desc">Title bar text and icon color</div></div>
+          <div class="token-card"><div class="token-key">Surface.MenuBar</div><div class="token-desc">Top menu bar background</div></div>
+          <div class="token-card"><div class="token-key">Surface.TableHeader</div><div class="token-desc">Column header background in tables</div></div>
+          <div class="token-card slate"><div class="token-key">Drawer.Background</div><div class="token-desc">Slide-out drawer / panel background</div></div>
+          <div class="token-card slate"><div class="token-key">Body</div><div class="token-desc">Page body / canvas background</div></div>
+        </div>
+      </section>
+
+      <!-- ─── TEXT ─── -->
+      <section id="text">
+        <h2><span class="section-num">07</span> Text</h2>
+        <p>Text tokens cover every foreground label in the UI. At minimum, set <code>Text</code> — the others inherit from it where unset.</p>
+
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Text</div><div class="token-desc">Primary body text and input text</div></div>
+          <div class="token-card"><div class="token-key">Text.Secondary</div><div class="token-desc">Subdued labels, captions</div></div>
+          <div class="token-card"><div class="token-key">Text.Disabled</div><div class="token-desc">Disabled / inactive labels</div></div>
+          <div class="token-card rust"><div class="token-key">Text.Error</div><div class="token-desc">Validation errors and warnings</div></div>
+          <div class="token-card"><div class="token-key">Text.Offset</div><div class="token-desc">Text on offset / raised surfaces</div></div>
+        </div>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          <code>Input.Text</code> is intentionally mapped to the same color as <code>Text</code>. You do not need to set a separate input text token — changing <code>Text</code> affects both.
+        </div>
+      </section>
+
+      <!-- ─── ACCENT ─── -->
+      <section id="accent">
+        <h2><span class="section-num">08</span> Accent</h2>
+        <p>Accent colors are used for selection highlights, active indicators, and branded interactive elements.</p>
+
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Accent</div><div class="token-desc">Primary brand / selection highlight color</div></div>
+          <div class="token-card"><div class="token-key">Accent.Alternative</div><div class="token-desc">Secondary accent for contrast situations</div></div>
+          <div class="token-card slate"><div class="token-key">Menu.Highlight</div><div class="token-desc">Highlighted / selected menu item background</div></div>
+          <div class="token-card slate"><div class="token-key">ProgressBackground</div><div class="token-desc">Progress bar fill color</div></div>
+        </div>
+      </section>
+
+      <!-- ─── BUTTONS ─── -->
+      <section id="buttons">
+        <h2><span class="section-num">09</span> Buttons</h2>
+        <p>Noveller uses three button roles — <strong>Primary</strong>, <strong>Secondary</strong>, and <strong>Icon</strong>. Each role has its own set of five tokens covering the resting, hover, and text states.</p>
+
+        <h3>Primary button</h3>
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Button.Primary</div><div class="token-desc">Resting background</div></div>
+          <div class="token-card"><div class="token-key">Button.Primary.Text</div><div class="token-desc">Resting label color</div></div>
+          <div class="token-card"><div class="token-key">Button.Primary.Hover</div><div class="token-desc">Hovered background</div></div>
+          <div class="token-card"><div class="token-key">Button.Primary.Text.Hover</div><div class="token-desc">Hovered label color</div></div>
+          <div class="token-card"><div class="token-key">Button.Primary.Border</div><div class="token-desc">Border stroke</div></div>
+        </div>
+
+        <h3>Secondary button</h3>
+        <div class="token-grid">
+          <div class="token-card green"><div class="token-key">Button.Secondary</div><div class="token-desc">Resting background</div></div>
+          <div class="token-card green"><div class="token-key">Button.Secondary.Text</div><div class="token-desc">Resting label color</div></div>
+          <div class="token-card green"><div class="token-key">Button.Secondary.Hover</div><div class="token-desc">Hovered background</div></div>
+          <div class="token-card green"><div class="token-key">Button.Secondary.Text.Hover</div><div class="token-desc">Hovered label color</div></div>
+          <div class="token-card green"><div class="token-key">Button.Secondary.Border</div><div class="token-desc">Border stroke</div></div>
+        </div>
+
+        <h3>Icon button</h3>
+        <div class="token-grid">
+          <div class="token-card slate"><div class="token-key">Button.Icon</div><div class="token-desc">Resting background</div></div>
+          <div class="token-card slate"><div class="token-key">Button.Icon.Text</div><div class="token-desc">Icon / glyph color</div></div>
+          <div class="token-card slate"><div class="token-key">Button.Icon.Hover</div><div class="token-desc">Hovered background</div></div>
+          <div class="token-card slate"><div class="token-key">Button.Icon.Text.Hover</div><div class="token-desc">Hovered icon color</div></div>
+          <div class="token-card slate"><div class="token-key">Button.Icon.Border</div><div class="token-desc">Border stroke</div></div>
+        </div>
+      </section>
+
+      <!-- ─── INPUTS & SLIDERS ─── -->
+      <section id="inputs">
+        <h2><span class="section-num">10</span> Inputs &amp; Sliders</h2>
+        <p>Input tokens style text fields, combo boxes, and similar form controls. Slider tokens cover the track and thumb of range controls.</p>
+
+        <h3>Input fields</h3>
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Input.Background</div><div class="token-desc">Text field background</div></div>
+          <div class="token-card"><div class="token-key">Input.Border</div><div class="token-desc">Text field border (resting)</div></div>
+          <div class="token-card"><div class="token-key">Input.Border.Light</div><div class="token-desc">Subtle inner / secondary border</div></div>
+        </div>
+
+        <h3>Sliders</h3>
+        <div class="token-grid">
+          <div class="token-card green"><div class="token-key">Slider.Track.Background</div><div class="token-desc">Unfilled track fill</div></div>
+          <div class="token-card green"><div class="token-key">Slider.Track.Border</div><div class="token-desc">Track border / outline</div></div>
+          <div class="token-card green"><div class="token-key">Slider.Thumb.Background</div><div class="token-desc">Draggable thumb fill</div></div>
+        </div>
+      </section>
+
+      <!-- ─── EDITOR ─── -->
+      <section id="editor">
+        <h2><span class="section-num">11</span> Editor</h2>
+        <p>Editor tokens control the writing canvas and its context menu. The editor is the largest visual surface in Noveller, so these tokens have a significant impact on the overall feel of a skin.</p>
+
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Editor.Background</div><div class="token-desc">Writing canvas background</div></div>
+          <div class="token-card"><div class="token-key">Editor.Text</div><div class="token-desc">Prose text color (also used for editor menu text)</div></div>
+          <div class="token-card"><div class="token-key">Editor.Selection</div><div class="token-desc">Selected text highlight</div></div>
+          <div class="token-card slate"><div class="token-key">Editor.Menu.Background</div><div class="token-desc">Editor context menu background and its hover state</div></div>
+        </div>
+
+        <div class="callout">
+          <strong>Note</strong>
+          <code>Editor.Menu.Background</code> is intentionally applied to both the resting and hover state of the editor's context menu — Noveller uses the same color for both. If you want a visible hover effect in the editor menu, consider also setting <code>Menu.Highlight</code>.
+        </div>
+      </section>
+
+      <!-- ─── CARDS, PILLS & ADORNERS ─── -->
+      <section id="cards">
+        <h2><span class="section-num">12</span> Cards, Pills &amp; Adorners</h2>
+        <p>Cards are raised content containers. Pills are inline chip-style labels. Adorners overlay the writing canvas to annotate paragraphs and inline comments.</p>
+
+        <h3>Cards</h3>
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Cards</div><div class="token-desc">Card background</div></div>
+          <div class="token-card"><div class="token-key">Cards.Border</div><div class="token-desc">Card border stroke</div></div>
+        </div>
+
+        <h3>Pills</h3>
+        <div class="token-grid">
+          <div class="token-card green"><div class="token-key">Pills.Background</div><div class="token-desc">Pill chip background</div></div>
+          <div class="token-card green"><div class="token-key">Pills.Border</div><div class="token-desc">Pill chip border</div></div>
+          <div class="token-card green"><div class="token-key">Pills.Foreground</div><div class="token-desc">Pill chip label color</div></div>
+        </div>
+
+        <h3>Adorners</h3>
+        <div class="token-grid">
+          <div class="token-card slate"><div class="token-key">Adorner.CommentCard.Background</div><div class="token-desc">Inline comment card background</div></div>
+          <div class="token-card slate"><div class="token-key">Adorner.CommentCard.Background.Focused</div><div class="token-desc">Comment card when active / focused</div></div>
+          <div class="token-card slate"><div class="token-key">Adorner.CommentCard.Border</div><div class="token-desc">Comment card border</div></div>
+          <div class="token-card slate"><div class="token-key">Adorner.Paragraph.Action</div><div class="token-desc">Action paragraph side indicator</div></div>
+          <div class="token-card slate"><div class="token-key">Adorner.Paragraph.Dialogue</div><div class="token-desc">Dialogue paragraph side indicator</div></div>
+          <div class="token-card slate"><div class="token-key">Adorner.Paragraph.Description</div><div class="token-desc">Description paragraph side indicator</div></div>
+        </div>
+      </section>
+
+      <!-- ─── SCROLLBARS ─── -->
+      <section id="scrollbars">
+        <h2><span class="section-num">13</span> Scrollbars</h2>
+        <p>Scrollbar tokens work differently from all other tokens. Noveller bakes opacity values directly into the brushes at load time, so you supply an <strong>opaque base color</strong> and the system applies the correct transparency automatically.</p>
+
+        <table>
+          <tr><th>Token</th><th>Opacity applied</th><th>Usage</th></tr>
+          <tr><td>Scrollbar.Background</td><td>0.0 (invisible)</td><td>Track background at rest</td></tr>
+          <tr><td>Scrollbar.Background.Hover</td><td>0.5</td><td>Track background on hover</td></tr>
+          <tr><td>Scrollbar.Thumb</td><td>0.5</td><td>Thumb (handle) at rest</td></tr>
+          <tr><td>Scrollbar.Thumb.Hover</td><td>0.8</td><td>Thumb on hover</td></tr>
+        </table>
+
+        <pre><code><span class="cmt">// Scrollbar example — use opaque colors only</span>
+<span class="str">"Scrollbar.Background"</span><span class="pun">:</span>       <span class="typ">"#313244"</span><span class="pun">,</span>  <span class="cmt">← becomes fully transparent</span>
+<span class="str">"Scrollbar.Background.Hover"</span><span class="pun">:</span> <span class="typ">"#45475a"</span><span class="pun">,</span>  <span class="cmt">← rendered at 50% opacity</span>
+<span class="str">"Scrollbar.Thumb"</span><span class="pun">:</span>           <span class="typ">"#cdd6f4"</span><span class="pun">,</span>  <span class="cmt">← rendered at 50% opacity</span>
+<span class="str">"Scrollbar.Thumb.Hover"</span><span class="pun">:</span>      <span class="typ">"#ffffff"</span>   <span class="cmt">← rendered at 80% opacity</span>
+</code><span class="lang-tag">.skin</span></pre>
+
+        <div class="callout warn">
+          <strong>Warning</strong>
+          Any alpha channel in your scrollbar color values is ignored — the opacity listed in the table above is always what gets applied. Use <code>#RRGGBB</code> hex for scrollbar tokens.
+        </div>
+      </section>
+
+      <!-- ─── DROP SHADOW ─── -->
+      <section id="shadow">
+        <h2><span class="section-num">14</span> Drop Shadow</h2>
+        <p>The global drop shadow effect is controlled by a single color token. Noveller builds a <code>DropShadowEffect</code> with fixed blur and opacity settings — only the shadow color comes from your skin.</p>
+
+        <table>
+          <tr><th>Token</th><th>Fixed settings</th></tr>
+          <tr><td>DropShadow</td><td>BlurRadius 12 · Opacity 0.06 · ShadowDepth 2</td></tr>
+        </table>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          For dark skins, set <code>DropShadow</code> to <code>Black</code> or a very dark shade. For light skins a soft warm grey like <code>#8a7a6a</code> tends to look more natural than pure black.
+        </div>
+      </section>
+
+      <!-- ─── MISC ─── -->
+      <section id="misc">
+        <h2><span class="section-num">15</span> Miscellaneous</h2>
+        <p>A few tokens that don't belong to a single component group.</p>
+
+        <div class="token-grid">
+          <div class="token-card"><div class="token-key">Tooltip.Background</div><div class="token-desc">Tooltip popup background</div></div>
+          <div class="token-card"><div class="token-key">Tooltip.Text</div><div class="token-desc">Tooltip label color</div></div>
+        </div>
+      </section>
+
+      <!-- ─── MINIMAL EXAMPLE ─── -->
+      <section id="minimal-example">
+        <h2><span class="section-num">16</span> Minimal Example</h2>
+        <p>The smallest viable skin covers just the surface, text, and accent. Noveller falls back to <code>Colors.Black</code> for any token you omit, so start here and expand as needed.</p>
+
+        <pre><code><span class="pun">{</span>
+  <span class="str">"Colors"</span><span class="pun">: {</span>
+    <span class="cmt">// Surface</span>
+    <span class="str">"Surface.Background"</span><span class="pun">:</span>  <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Surface.Offset"</span><span class="pun">:</span>      <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Surface.Border"</span><span class="pun">:</span>      <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Surface.TitleBar"</span><span class="pun">:</span>    <span class="typ">"#11111b"</span><span class="pun">,</span>
+
+    <span class="cmt">// Text</span>
+    <span class="str">"Text"</span><span class="pun">:</span>                <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Text.Secondary"</span><span class="pun">:</span>      <span class="typ">"#a6adc8"</span><span class="pun">,</span>
+
+    <span class="cmt">// Accent</span>
+    <span class="str">"Accent"</span><span class="pun">:</span>              <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+
+    <span class="cmt">// Editor</span>
+    <span class="str">"Editor.Background"</span><span class="pun">:</span>   <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Editor.Text"</span><span class="pun">:</span>         <span class="typ">"#cdd6f4"</span>
+  <span class="pun">}</span>
+<span class="pun">}</span>
+</code><span class="lang-tag">Minimal.skin</span></pre>
+      </section>
+
+      <!-- ─── FULL EXAMPLE ─── -->
+      <section id="full-example">
+        <h2><span class="section-num">17</span> Full Example</h2>
+        <p>A production-quality dark skin covering all token groups, including the metadata fields. Use this as a starting template and adjust colors to taste.</p>
+
+        <pre><code><span class="pun">{</span>
+  <span class="str">"name"</span><span class="pun">:</span>        <span class="typ">"Midnight Ink"</span><span class="pun">,</span>
+  <span class="str">"author"</span><span class="pun">:</span>      <span class="typ">"Your Name"</span><span class="pun">,</span>
+  <span class="str">"description"</span><span class="pun">:</span> <span class="typ">"A deep dark theme with violet accents."</span><span class="pun">,</span>
+  <span class="str">"isDark"</span><span class="pun">:</span>      <span class="typ">true</span><span class="pun">,</span>
+  <span class="str">"Colors"</span><span class="pun">: {</span>
+
+    <span class="cmt">// ── Surface &amp; Chrome ──────────────────────────</span>
+    <span class="str">"Surface.Background"</span><span class="pun">:</span>       <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Surface.Offset"</span><span class="pun">:</span>           <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Surface.Offset.Hover"</span><span class="pun">:</span>     <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Surface.Border"</span><span class="pun">:</span>           <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Surface.Border.Light"</span><span class="pun">:</span>     <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Surface.TitleBar"</span><span class="pun">:</span>         <span class="typ">"#11111b"</span><span class="pun">,</span>
+    <span class="str">"Surface.TitleBar.Text"</span><span class="pun">:</span>    <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Surface.MenuBar"</span><span class="pun">:</span>          <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Surface.TableHeader"</span><span class="pun">:</span>      <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Drawer.Background"</span><span class="pun">:</span>        <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Body"</span><span class="pun">:</span>                     <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Text ──────────────────────────────────────</span>
+    <span class="str">"Text"</span><span class="pun">:</span>                     <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Text.Secondary"</span><span class="pun">:</span>           <span class="typ">"#a6adc8"</span><span class="pun">,</span>
+    <span class="str">"Text.Disabled"</span><span class="pun">:</span>            <span class="typ">"#585b70"</span><span class="pun">,</span>
+    <span class="str">"Text.Error"</span><span class="pun">:</span>               <span class="typ">"#f38ba8"</span><span class="pun">,</span>
+    <span class="str">"Text.Offset"</span><span class="pun">:</span>              <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Accent ────────────────────────────────────</span>
+    <span class="str">"Accent"</span><span class="pun">:</span>                   <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+    <span class="str">"Accent.Alternative"</span><span class="pun">:</span>       <span class="typ">"#89b4fa"</span><span class="pun">,</span>
+    <span class="str">"Menu.Highlight"</span><span class="pun">:</span>           <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"ProgressBackground"</span><span class="pun">:</span>       <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Buttons — Primary ─────────────────────────</span>
+    <span class="str">"Button.Primary"</span><span class="pun">:</span>           <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+    <span class="str">"Button.Primary.Text"</span><span class="pun">:</span>      <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Button.Primary.Hover"</span><span class="pun">:</span>     <span class="typ">"#b4befe"</span><span class="pun">,</span>
+    <span class="str">"Button.Primary.Text.Hover"</span><span class="pun">:</span><span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Button.Primary.Border"</span><span class="pun">:</span>    <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Buttons — Secondary ───────────────────────</span>
+    <span class="str">"Button.Secondary"</span><span class="pun">:</span>         <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Button.Secondary.Text"</span><span class="pun">:</span>    <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Button.Secondary.Hover"</span><span class="pun">:</span>   <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Button.Secondary.Text.Hover"</span><span class="pun">:</span><span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Button.Secondary.Border"</span><span class="pun">:</span>  <span class="typ">"#45475a"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Buttons — Icon ────────────────────────────</span>
+    <span class="str">"Button.Icon"</span><span class="pun">:</span>              <span class="typ">"Transparent"</span><span class="pun">,</span>
+    <span class="str">"Button.Icon.Text"</span><span class="pun">:</span>         <span class="typ">"#a6adc8"</span><span class="pun">,</span>
+    <span class="str">"Button.Icon.Hover"</span><span class="pun">:</span>        <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Button.Icon.Text.Hover"</span><span class="pun">:</span>   <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Button.Icon.Border"</span><span class="pun">:</span>       <span class="typ">"Transparent"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Inputs ────────────────────────────────────</span>
+    <span class="str">"Input.Background"</span><span class="pun">:</span>         <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Input.Border"</span><span class="pun">:</span>             <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Input.Border.Light"</span><span class="pun">:</span>       <span class="typ">"#313244"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Sliders ───────────────────────────────────</span>
+    <span class="str">"Slider.Track.Background"</span><span class="pun">:</span>  <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Slider.Track.Border"</span><span class="pun">:</span>      <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Slider.Thumb.Background"</span><span class="pun">:</span>  <span class="typ">"#cba6f7"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Editor ────────────────────────────────────</span>
+    <span class="str">"Editor.Background"</span><span class="pun">:</span>        <span class="typ">"#1e1e2e"</span><span class="pun">,</span>
+    <span class="str">"Editor.Text"</span><span class="pun">:</span>              <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+    <span class="str">"Editor.Selection"</span><span class="pun">:</span>         <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Editor.Menu.Background"</span><span class="pun">:</span>   <span class="typ">"#313244"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Cards ─────────────────────────────────────</span>
+    <span class="str">"Cards"</span><span class="pun">:</span>                    <span class="typ">"#181825"</span><span class="pun">,</span>
+    <span class="str">"Cards.Border"</span><span class="pun">:</span>             <span class="typ">"#313244"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Pills ─────────────────────────────────────</span>
+    <span class="str">"Pills.Background"</span><span class="pun">:</span>         <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Pills.Border"</span><span class="pun">:</span>             <span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Pills.Foreground"</span><span class="pun">:</span>         <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Adorners ──────────────────────────────────</span>
+    <span class="str">"Adorner.CommentCard.Background"</span><span class="pun">:</span>        <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Adorner.CommentCard.Background.Focused"</span><span class="pun">:</span><span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Adorner.CommentCard.Border"</span><span class="pun">:</span>            <span class="typ">"#585b70"</span><span class="pun">,</span>
+    <span class="str">"Adorner.Paragraph.Action"</span><span class="pun">:</span>             <span class="typ">"#f38ba8"</span><span class="pun">,</span>
+    <span class="str">"Adorner.Paragraph.Dialogue"</span><span class="pun">:</span>           <span class="typ">"#89dceb"</span><span class="pun">,</span>
+    <span class="str">"Adorner.Paragraph.Description"</span><span class="pun">:</span>        <span class="typ">"#a6e3a1"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Scrollbars (opaque colors only) ───────────</span>
+    <span class="str">"Scrollbar.Background"</span><span class="pun">:</span>      <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Scrollbar.Background.Hover"</span><span class="pun">:</span><span class="typ">"#45475a"</span><span class="pun">,</span>
+    <span class="str">"Scrollbar.Thumb"</span><span class="pun">:</span>           <span class="typ">"#585b70"</span><span class="pun">,</span>
+    <span class="str">"Scrollbar.Thumb.Hover"</span><span class="pun">:</span>     <span class="typ">"#7f849c"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Tooltips ──────────────────────────────────</span>
+    <span class="str">"Tooltip.Background"</span><span class="pun">:</span>       <span class="typ">"#313244"</span><span class="pun">,</span>
+    <span class="str">"Tooltip.Text"</span><span class="pun">:</span>             <span class="typ">"#cdd6f4"</span><span class="pun">,</span>
+
+    <span class="cmt">// ── Drop Shadow ───────────────────────────────</span>
+    <span class="str">"DropShadow"</span><span class="pun">:</span>               <span class="typ">"Black"</span>
+
+  <span class="pun">}</span>
+<span class="pun">}</span>
+</code><span class="lang-tag">MidnightInk.skin</span></pre>
+
+        <a href="#top" class="back-top">↑ Back to top</a>
+      </section>
+
+      <!-- ─── QUICK REF ─── -->
+      <section id="quick-ref">
+        <h2><span class="section-num">18</span> All Tokens</h2>
+        <p>Every recognized color token, grouped by area. All are optional — omitted tokens fall back to <code>Colors.Black</code> unless noted.</p>
+
+        <table>
+          <tr><th>Token</th><th>Area</th><th>Notes</th></tr>
+          <tr><td>Surface.Background</td><td>Surface</td><td>Main window background</td></tr>
+          <tr><td>Surface.Offset</td><td>Surface</td><td>Raised panels</td></tr>
+          <tr><td>Surface.Offset.Hover</td><td>Surface</td><td></td></tr>
+          <tr><td>Surface.Border</td><td>Surface</td><td>Primary divider</td></tr>
+          <tr><td>Surface.Border.Light</td><td>Surface</td><td>Subtle divider</td></tr>
+          <tr><td>Surface.TitleBar</td><td>Surface</td><td></td></tr>
+          <tr><td>Surface.TitleBar.Text</td><td>Surface</td><td></td></tr>
+          <tr><td>Surface.MenuBar</td><td>Surface</td><td></td></tr>
+          <tr><td>Surface.TableHeader</td><td>Surface</td><td></td></tr>
+          <tr><td>Drawer.Background</td><td>Surface</td><td>Slide-out panel</td></tr>
+          <tr><td>Body</td><td>Surface</td><td>Page canvas background</td></tr>
+          <tr><td>Text</td><td>Text</td><td>Primary text; also used as Input.Text</td></tr>
+          <tr><td>Text.Secondary</td><td>Text</td><td></td></tr>
+          <tr><td>Text.Disabled</td><td>Text</td><td></td></tr>
+          <tr><td>Text.Error</td><td>Text</td><td></td></tr>
+          <tr><td>Text.Offset</td><td>Text</td><td>Text on offset surfaces</td></tr>
+          <tr><td>Accent</td><td>Accent</td><td></td></tr>
+          <tr><td>Accent.Alternative</td><td>Accent</td><td></td></tr>
+          <tr><td>Menu.Highlight</td><td>Accent</td><td>Selected menu item</td></tr>
+          <tr><td>ProgressBackground</td><td>Accent</td><td>Progress bar fill</td></tr>
+          <tr><td>Button.Primary</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Primary.Text</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Primary.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Primary.Text.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Primary.Border</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Secondary</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Secondary.Text</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Secondary.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Secondary.Text.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Secondary.Border</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Icon</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Icon.Text</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Icon.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Icon.Text.Hover</td><td>Buttons</td><td></td></tr>
+          <tr><td>Button.Icon.Border</td><td>Buttons</td><td></td></tr>
+          <tr><td>Input.Background</td><td>Inputs</td><td></td></tr>
+          <tr><td>Input.Border</td><td>Inputs</td><td></td></tr>
+          <tr><td>Input.Border.Light</td><td>Inputs</td><td></td></tr>
+          <tr><td>Slider.Track.Background</td><td>Sliders</td><td></td></tr>
+          <tr><td>Slider.Track.Border</td><td>Sliders</td><td></td></tr>
+          <tr><td>Slider.Thumb.Background</td><td>Sliders</td><td></td></tr>
+          <tr><td>Editor.Background</td><td>Editor</td><td></td></tr>
+          <tr><td>Editor.Text</td><td>Editor</td><td>Also applied to editor menu text</td></tr>
+          <tr><td>Editor.Selection</td><td>Editor</td><td>Selected text highlight</td></tr>
+          <tr><td>Editor.Menu.Background</td><td>Editor</td><td>Context menu (resting &amp; hover)</td></tr>
+          <tr><td>Cards</td><td>Cards</td><td></td></tr>
+          <tr><td>Cards.Border</td><td>Cards</td><td></td></tr>
+          <tr><td>Pills.Background</td><td>Pills</td><td></td></tr>
+          <tr><td>Pills.Border</td><td>Pills</td><td></td></tr>
+          <tr><td>Pills.Foreground</td><td>Pills</td><td></td></tr>
+          <tr><td>Adorner.CommentCard.Background</td><td>Adorners</td><td></td></tr>
+          <tr><td>Adorner.CommentCard.Background.Focused</td><td>Adorners</td><td></td></tr>
+          <tr><td>Adorner.CommentCard.Border</td><td>Adorners</td><td></td></tr>
+          <tr><td>Adorner.Paragraph.Action</td><td>Adorners</td><td></td></tr>
+          <tr><td>Adorner.Paragraph.Dialogue</td><td>Adorners</td><td></td></tr>
+          <tr><td>Adorner.Paragraph.Description</td><td>Adorners</td><td></td></tr>
+          <tr><td>Scrollbar.Background</td><td>Scrollbars</td><td>Fallback: Transparent · Opacity: 0.0</td></tr>
+          <tr><td>Scrollbar.Background.Hover</td><td>Scrollbars</td><td>Fallback: Gray · Opacity: 0.5</td></tr>
+          <tr><td>Scrollbar.Thumb</td><td>Scrollbars</td><td>Fallback: Gray · Opacity: 0.5</td></tr>
+          <tr><td>Scrollbar.Thumb.Hover</td><td>Scrollbars</td><td>Fallback: White · Opacity: 0.8</td></tr>
+          <tr><td>Tooltip.Background</td><td>Misc</td><td></td></tr>
+          <tr><td>Tooltip.Text</td><td>Misc</td><td></td></tr>
+          <tr><td>DropShadow</td><td>Misc</td><td>Shadow color only; blur/opacity are fixed</td></tr>
+        </table>
+
+        <a href="#top" class="back-top">↑ Back to top</a>
+      </section>
+
+    </div><!-- .content -->
+  </main>
+</div>
+
+<script>
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
