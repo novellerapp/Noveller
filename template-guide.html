@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noveller · Template Authoring Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:       #1a1410;
+    --paper:     #f5f0e8;
+    --cream:     #ede7d6;
+    --amber:     #c8873a;
+    --amber-dim: #a36a25;
+    --rust:      #8b3a2f;
+    --sage:      #4a6741;
+    --slate:     #3d4a5c;
+    --muted:     #7a6e5f;
+    --rule:      rgba(26,20,16,0.12);
+    --code-bg:   #2a2118;
+    --code-text: #e8d9bc;
+    --code-key:  #f0a855;
+    --code-str:  #89c775;
+    --code-type: #7fb3d9;
+    --code-cmt:  #7a6e5f;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--cream);
+    border-right: 1px solid var(--rule);
+    padding: 2rem 0 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .nav-brand {
+    padding: 0 1.5rem 1.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1rem;
+  }
+
+  .nav-brand .wordmark {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+  }
+
+  .nav-brand .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .nav-section-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.75rem 1.5rem 0.25rem;
+  }
+
+  nav a {
+    display: block;
+    padding: 0.3rem 1.5rem;
+    font-family: 'Lora', serif;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+
+  nav a:hover {
+    color: var(--amber);
+    border-left-color: var(--amber);
+    background: rgba(200,135,58,0.06);
+  }
+
+  nav a.active {
+    color: var(--amber-dim);
+    border-left-color: var(--amber-dim);
+    font-weight: 600;
+  }
+
+  nav a.sub {
+    padding-left: 2.25rem;
+    font-size: 0.77rem;
+  }
+
+  /* ── MAIN ── */
+  main {
+    padding: 0;
+    max-width: 820px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 4rem 3.5rem 3rem;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '⟨ .weave ⟩';
+    position: absolute;
+    right: 3rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 4.5rem;
+    color: var(--rule);
+    letter-spacing: -0.04em;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber-dim);
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 480px;
+    line-height: 1.8;
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content { padding: 0 3.5rem 5rem; }
+
+  section { padding-top: 3rem; }
+
+  section + section { border-top: 1px solid var(--rule); }
+
+  h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  h2 .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+    background: rgba(200,135,58,0.1);
+    padding: 0.15em 0.5em;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 1.75rem 0 0.5rem;
+  }
+
+  p { color: #3d3228; margin-bottom: 0.75rem; }
+
+  ul, ol {
+    padding-left: 1.4rem;
+    margin-bottom: 0.75rem;
+    color: #3d3228;
+  }
+
+  li { margin-bottom: 0.25rem; }
+
+  strong { color: var(--ink); font-weight: 700; }
+
+  em { font-style: italic; color: var(--amber-dim); }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 1.25rem 1.4rem;
+    margin: 0.75rem 0 1rem;
+    overflow-x: auto;
+    border: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+  }
+
+  pre .lang-tag {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a3f2f;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--code-text);
+  }
+
+  :not(pre) > code {
+    background: rgba(200,135,58,0.12);
+    color: var(--amber-dim);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.8em;
+  }
+
+  .kw  { color: var(--code-key); }   /* keywords / type names */
+  .str { color: var(--code-str); }   /* strings / values */
+  .typ { color: var(--code-type); }  /* modifiers / options */
+  .cmt { color: var(--code-cmt); font-style: italic; }  /* comments */
+  .pun { color: #c8a06a; }           /* punctuation */
+
+  /* ── FIELD TYPE TABLE ── */
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+
+  .field-card {
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1rem 1.1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .field-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--amber);
+  }
+
+  .field-card.green::before  { background: var(--sage); }
+  .field-card.slate::before  { background: var(--slate); }
+  .field-card.rust::before   { background: var(--rust); }
+
+  .field-card .type-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--amber-dim);
+    margin-bottom: 0.2rem;
+  }
+  .field-card.green .type-name  { color: var(--sage); }
+  .field-card.slate .type-name  { color: var(--slate); }
+  .field-card.rust .type-name   { color: var(--rust); }
+
+  .field-card .type-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-left: 3px solid var(--amber);
+    background: rgba(200,135,58,0.07);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 4px 4px 0;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+    color: #3d3228;
+  }
+
+  .callout.warn {
+    border-left-color: var(--rust);
+    background: rgba(139,58,47,0.06);
+  }
+
+  .callout.tip {
+    border-left-color: var(--sage);
+    background: rgba(74,103,65,0.06);
+  }
+
+  .callout strong {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .callout.warn strong { color: var(--rust); }
+  .callout.tip  strong { color: var(--sage); }
+  .callout strong:not(.callout.warn strong):not(.callout.tip strong) { color: var(--amber-dim); }
+
+  /* ── SYNTAX TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.83rem;
+    margin: 0.75rem 0 1rem;
+  }
+
+  th {
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.4rem 0.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(26,20,16,0.07);
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--amber-dim);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:nth-child(even) td { background: rgba(237,231,214,0.5); }
+
+  /* ── BACK TO TOP ── */
+  .back-top {
+    display: inline-block;
+    margin-top: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+
+  .back-top:hover { color: var(--amber); }
+
+  /* ── SCROLLBAR ── */
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+  /* ── ACTIVE NAV HIGHLIGHT ── */
+  .content-inner section { scroll-margin-top: 2rem; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ─── SIDEBAR ─── -->
+  <nav id="sidebar">
+    <div class="nav-brand">
+      <span class="wordmark">Noveller</span>
+      <span class="subtitle">.weave Template Guide</span>
+    </div>
+
+    <span class="nav-section-label">Structure</span>
+    <a href="#hierarchy">Hierarchy</a>
+    <a href="#files">File &amp; Naming</a>
+    <a href="#inheritance">Template Inheritance</a>
+
+    <span class="nav-section-label">Fields</span>
+    <a href="#field-types">Field Types Overview</a>
+    <a href="#text">text</a>
+    <a href="#multiline">multiline</a>
+    <a href="#number">number</a>
+    <a href="#tags">tags</a>
+    <a href="#list">list</a>
+    <a href="#rate">rate</a>
+    <a href="#dropdown">dropdown</a>
+    <a href="#references">references</a>
+
+    <span class="nav-section-label">Logic</span>
+    <a href="#conditionals">Conditionals</a>
+    <a href="#hints">Field Hints</a>
+    <a href="#comments">Comments</a>
+
+    <span class="nav-section-label">Reference</span>
+    <a href="#quick-ref">Quick Reference</a>
+    <a href="#full-example">Full Example</a>
+  </nav>
+
+  <!-- ─── MAIN ─── -->
+  <main>
+    <div class="hero" id="top">
+      <span class="hero-tag">Noveller · Template System</span>
+      <h1>Writing <em>Character</em><br>Sheet Templates</h1>
+      <p>A complete authoring guide for <code>.weave</code> template files — structure, field types, conditionals, inheritance, and more.</p>
+    </div>
+
+    <div class="content">
+
+      <!-- ─── HIERARCHY ─── -->
+      <section id="hierarchy">
+        <h2><span class="section-num">01</span> Document Hierarchy</h2>
+        <p>Every template is built from three nested layers. Noveller reads them top-to-bottom and assembles the UI automatically.</p>
+
+        <pre><code><span class="cmt">// Level 1 — Category (tab)</span>
+<span class="kw">#</span>CategoryName
+
+<span class="cmt">// Level 2 — Section (collapsible group)</span>
+<span class="kw">##</span>SectionName
+
+<span class="cmt">// Level 3 — Field</span>
+<span class="str">Key Label</span><span class="pun">: [</span><span class="typ">type</span><span class="pun">]</span>
+</code><span class="lang-tag">.weave</span></pre>
+
+        <div class="callout">
+          <strong>Rule</strong>
+          Fields must live inside a <code>##Section</code>. A category with no section won't render any fields.
+        </div>
+
+        <h3>Minimal working example</h3>
+        <pre><code><span class="kw">#</span>Identity
+
+<span class="kw">##</span>Basic
+<span class="str">Name</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+<span class="str">Age</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span>
+<span class="str">Species</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+</code><span class="lang-tag">.weave</span></pre>
+      </section>
+
+      <!-- ─── FILES ─── -->
+      <section id="files">
+        <h2><span class="section-num">02</span> File &amp; Naming</h2>
+        <p>Templates are plain text files saved with the <code>.weave</code> extension and placed in the <code>Templates/</code> folder.</p>
+
+        <pre><code>Templates/
+  Overview.weave          <span class="cmt">← auto-detected Overview tab</span>
+  BasicFantasy.weave
+  DetailedFantasy.weave
+  SciFiCrew.weave
+</code><span class="lang-tag">folder</span></pre>
+
+        <div class="callout tip">
+          <strong>Tip</strong>
+          A file named <strong>Overview.weave</strong> is automatically used as the character's Overview tab. It does not need an <code>Extends</code> statement and is the first tab shown.
+        </div>
+      </section>
+
+      <!-- ─── INHERITANCE ─── -->
+      <section id="inheritance">
+        <h2><span class="section-num">03</span> Template Inheritance</h2>
+        <p>A template can <em>extend</em> another, inheriting all its categories and sections then appending its own.</p>
+
+        <pre><code><span class="kw">Extends</span> <span class="str">BasicFantasy</span>
+
+<span class="kw">#</span>Magic
+
+<span class="kw">##</span>Abilities
+<span class="str">Primary Magic</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+<span class="str">Mana Pool</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span>
+</code><span class="lang-tag">DetailedFantasy.weave</span></pre>
+
+        <ul>
+          <li>The <code>Extends</code> line must be the <strong>first non-blank line</strong> of the file.</li>
+          <li>Write only the base template's <strong>filename without extension</strong> — e.g. <code>Extends BasicFantasy</code>.</li>
+          <li>Inheritance is <strong>recursive</strong>: a chain of A → B → C works fine.</li>
+          <li>Merging order: base categories come first, child categories append after.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Warning</strong>
+          The base file must exist in the same <code>Templates/</code> folder or the <code>Extends</code> line is silently ignored.
+        </div>
+      </section>
+
+      <!-- ─── FIELD TYPES OVERVIEW ─── -->
+      <section id="field-types">
+        <h2><span class="section-num">04</span> Field Types Overview</h2>
+        <p>Every field is declared with a <strong>key label</strong>, a colon, and a bracketed type expression:</p>
+        <pre><code><span class="str">Key Label</span><span class="pun">: [</span><span class="typ">type</span><span class="pun">]</span>
+<span class="str">Key Label</span><span class="pun">: [</span><span class="typ">type</span><span class="pun">=</span><span class="str">default</span><span class="pun">,</span><span class="typ">modifier</span><span class="pun">,</span><span class="typ">modifier2</span><span class="pun">]</span>
+</code></pre>
+
+        <div class="field-grid">
+          <div class="field-card"><div class="type-name">text</div><div class="type-desc">Single-line string input</div></div>
+          <div class="field-card"><div class="type-name">multiline</div><div class="type-desc">Large paragraph textarea</div></div>
+          <div class="field-card"><div class="type-name">number</div><div class="type-desc">Numeric input</div></div>
+          <div class="field-card"><div class="type-name">tags</div><div class="type-desc">Chip-style keyword list</div></div>
+          <div class="field-card green"><div class="type-name">list</div><div class="type-desc">Ordered item list with optional cap</div></div>
+          <div class="field-card green"><div class="type-name">rate</div><div class="type-desc">Visual rating with range &amp; style</div></div>
+          <div class="field-card slate"><div class="type-name">dropdown</div><div class="type-desc">Select from enumerated options</div></div>
+          <div class="field-card rust"><div class="type-name">@reference</div><div class="type-desc">Link to characters, items, or locations</div></div>
+        </div>
+      </section>
+
+      <!-- ─── TEXT ─── -->
+      <section id="text">
+        <h2><span class="section-num">05</span> text</h2>
+        <p>A single-line string input. Accepts an optional default value.</p>
+        <pre><code><span class="str">Nickname</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+<span class="str">Title</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">=</span><span class="str">Novice</span><span class="pun">]</span>       <span class="cmt">← default value "Novice"</span>
+</code></pre>
+        <table>
+          <tr><th>Syntax</th><th>Description</th></tr>
+          <tr><td>[text]</td><td>Plain single-line input</td></tr>
+          <tr><td>[text=<em>default</em>]</td><td>Pre-filled with a default string</td></tr>
+        </table>
+      </section>
+
+      <!-- ─── MULTILINE ─── -->
+      <section id="multiline">
+        <h2><span class="section-num">06</span> multiline</h2>
+        <p>A large free-form textarea, ideal for backstories, descriptions, or notes.</p>
+        <pre><code><span class="str">Backstory</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">]</span>
+<span class="str">Personal Notes</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">=</span><span class="str">Unknown origins.</span><span class="pun">]</span>
+</code></pre>
+      </section>
+
+      <!-- ─── NUMBER ─── -->
+      <section id="number">
+        <h2><span class="section-num">07</span> number</h2>
+        <p>A numeric input. Accepts an optional numeric default.</p>
+        <pre><code><span class="str">Age</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span>
+<span class="str">Starting Gold</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">=</span><span class="str">50</span><span class="pun">]</span>
+</code></pre>
+      </section>
+
+      <!-- ─── TAGS ─── -->
+      <section id="tags">
+        <h2><span class="section-num">08</span> tags</h2>
+        <p>A chip-style list of freeform keywords. Useful for personality traits, skills, or categories. An optional second argument caps how many tags are allowed.</p>
+        <pre><code><span class="str">Personality Traits</span><span class="pun">: [</span><span class="typ">tags</span><span class="pun">]</span>
+<span class="str">Primary Skills</span><span class="pun">: [</span><span class="typ">tags</span><span class="pun">,</span><span class="str">5</span><span class="pun">]</span>     <span class="cmt">← max 5 tags</span>
+</code></pre>
+        <table>
+          <tr><th>Syntax</th><th>Description</th></tr>
+          <tr><td>[tags]</td><td>Unlimited tags</td></tr>
+          <tr><td>[tags,<em>N</em>]</td><td>Maximum of N tags</td></tr>
+        </table>
+      </section>
+
+      <!-- ─── LIST ─── -->
+      <section id="list">
+        <h2><span class="section-num">09</span> list</h2>
+        <p>An ordered list of items — each entry is a separate line (not a chip). Supports an optional item cap.</p>
+        <pre><code><span class="str">Known Spells</span><span class="pun">: [</span><span class="typ">list</span><span class="pun">]</span>
+<span class="str">Top Allies</span><span class="pun">: [</span><span class="typ">list</span><span class="pun">,</span><span class="str">3</span><span class="pun">]</span>          <span class="cmt">← max 3 entries</span>
+</code></pre>
+        <table>
+          <tr><th>Syntax</th><th>Description</th></tr>
+          <tr><td>[list]</td><td>Unlimited list items</td></tr>
+          <tr><td>[list,<em>N</em>]</td><td>Maximum of N list items</td></tr>
+        </table>
+      </section>
+
+      <!-- ─── RATE ─── -->
+      <section id="rate">
+        <h2><span class="section-num">10</span> rate</h2>
+        <p>A visual rating control. Supports an optional default value, a numeric range, and a display style.</p>
+        <pre><code><span class="str">Leadership</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">]</span>                        <span class="cmt">← default star, no range</span>
+<span class="str">Magic Skill</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">=</span><span class="str">3</span><span class="pun">,</span><span class="str">0-10</span><span class="pun">]</span>               <span class="cmt">← starts at 3, range 0–10</span>
+<span class="str">Courage</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">,</span><span class="str">1-5</span><span class="pun">,</span><span class="str">heart</span><span class="pun">]</span>              <span class="cmt">← hearts, range 1–5</span>
+<span class="str">Agility</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">=</span><span class="str">2</span><span class="pun">,</span><span class="str">0-5</span><span class="pun">,</span><span class="str">circle</span><span class="pun">]</span>           <span class="cmt">← circles, default 2</span>
+</code></pre>
+        <table>
+          <tr><th>Argument</th><th>Position</th><th>Description</th></tr>
+          <tr><td>rate=<em>N</em></td><td>1st</td><td>Default starting value</td></tr>
+          <tr><td><em>min</em>-<em>max</em></td><td>2nd (modifier)</td><td>Numeric range, e.g. <code>0-10</code> or <code>1-5</code></td></tr>
+          <tr><td>star / heart / circle</td><td>3rd (modifier2)</td><td>Visual display style (default: <code>star</code>)</td></tr>
+        </table>
+        <div class="callout">
+          <strong>Note</strong>
+          The range argument is only parsed when it contains a <code>-</code> dash. A plain number in the second position is treated as a <code>maxItems</code> cap (same as <code>tags</code>/<code>list</code>).
+        </div>
+      </section>
+
+      <!-- ─── DROPDOWN ─── -->
+      <section id="dropdown">
+        <h2><span class="section-num">11</span> dropdown</h2>
+        <p>A select field with a fixed list of options. Declared by providing <strong>comma-separated option values</strong> — no explicit type keyword needed. Noveller auto-detects this when the first token is not a known type name.</p>
+        <pre><code><span class="str">Alignment</span><span class="pun">: [</span><span class="str">Lawful Good</span><span class="pun">,</span><span class="str">Neutral</span><span class="pun">,</span><span class="str">Chaotic Evil</span><span class="pun">]</span>
+<span class="str">Class</span><span class="pun">: [</span><span class="str">Warrior</span><span class="pun">,</span><span class="str">Mage</span><span class="pun">,</span><span class="str">Rogue</span><span class="pun">,</span><span class="str">Cleric</span><span class="pun">]</span>
+<span class="str">Rank</span><span class="pun">: [</span><span class="str">Recruit</span><span class="pun">,</span><span class="str">Soldier</span><span class="pun">,</span><span class="str">Officer</span><span class="pun">,</span><span class="str">Commander</span><span class="pun">]</span>
+</code></pre>
+        <div class="callout warn">
+          <strong>Warning — Name Collision</strong>
+          If your first option is a reserved word (<code>text</code>, <code>multiline</code>, <code>number</code>, <code>tags</code>, <code>list</code>, <code>rate</code>), it will be parsed as that field type instead of a dropdown. Choose option names that don't clash with reserved keywords.
+        </div>
+      </section>
+
+      <!-- ─── REFERENCES ─── -->
+      <section id="references">
+        <h2><span class="section-num">12</span> References</h2>
+        <p>Reference fields link a character to other entities in your project. Prefixed with <code>@</code>.</p>
+
+        <h3>Character references</h3>
+        <pre><code><span class="str">Mentor</span><span class="pun">: [</span><span class="kw">@character</span><span class="pun">]</span>        <span class="cmt">← single character</span>
+<span class="str">Allies</span><span class="pun">: [</span><span class="kw">@characters</span><span class="pun">]</span>       <span class="cmt">← multiple characters</span>
+<span class="str">Rivals</span><span class="pun">: [</span><span class="kw">@characters</span><span class="pun">,</span><span class="str">3</span><span class="pun">]</span>    <span class="cmt">← multiple, max 3</span>
+</code></pre>
+
+        <h3>Item references</h3>
+        <pre><code><span class="str">Signature Weapon</span><span class="pun">: [</span><span class="kw">@item</span><span class="pun">]</span>
+<span class="str">Artifacts</span><span class="pun">: [</span><span class="kw">@items</span><span class="pun">]</span>
+<span class="str">Carried Items</span><span class="pun">: [</span><span class="kw">@items</span><span class="pun">,</span><span class="str">6</span><span class="pun">]</span>
+</code></pre>
+
+        <h3>Location references</h3>
+        <pre><code><span class="str">Birthplace</span><span class="pun">: [</span><span class="kw">@location</span><span class="pun">]</span>
+<span class="str">Known Territories</span><span class="pun">: [</span><span class="kw">@locations</span><span class="pun">]</span>
+<span class="str">Visited Regions</span><span class="pun">: [</span><span class="kw">@locations</span><span class="pun">,</span><span class="str">5</span><span class="pun">]</span>
+</code></pre>
+
+        <table>
+          <tr><th>Type keyword</th><th>Links to</th></tr>
+          <tr><td>@character</td><td>One character</td></tr>
+          <tr><td>@characters</td><td>Multiple characters (optional max)</td></tr>
+          <tr><td>@location</td><td>One location</td></tr>
+          <tr><td>@locations</td><td>Multiple locations (optional max)</td></tr>
+          <tr><td>@item</td><td>One item</td></tr>
+          <tr><td>@items</td><td>Multiple items (optional max)</td></tr>
+        </table>
+      </section>
+
+      <!-- ─── CONDITIONALS ─── -->
+      <section id="conditionals">
+        <h2><span class="section-num">13</span> Conditionals</h2>
+        <p>Any <strong>category</strong>, <strong>section</strong>, or <strong>field</strong> can be shown or hidden based on the value of another field.</p>
+
+        <h3>Syntax</h3>
+        <pre><code><span class="str">Element Declaration</span> <span class="kw">?</span> <span class="str">FieldKey</span><span class="pun">=</span><span class="typ">expectedValue</span>
+</code></pre>
+
+        <p>The element is only rendered when the named field's current value matches the expected value exactly.</p>
+
+        <h3>Conditional category</h3>
+        <pre><code><span class="kw">#</span>Magic <span class="kw">?</span> <span class="str">UsesMagic</span><span class="pun">=</span><span class="typ">true</span>
+</code></pre>
+
+        <h3>Conditional section</h3>
+        <pre><code><span class="kw">##</span>Advanced Techniques <span class="kw">?</span> <span class="str">MagicTier</span><span class="pun">=</span><span class="typ">Expert</span>
+</code></pre>
+
+        <h3>Conditional field</h3>
+        <pre><code><span class="str">Dragon Bond Name</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span> <span class="kw">?</span> <span class="str">HasDragonBond</span><span class="pun">=</span><span class="typ">true</span>
+</code></pre>
+
+        <h3>Full conditional workflow example</h3>
+        <pre><code><span class="kw">#</span>Identity
+
+<span class="kw">##</span>Basics
+<span class="str">Name</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+<span class="str">UsesMagic</span><span class="pun">: [</span><span class="str">Yes</span><span class="pun">,</span><span class="str">No</span><span class="pun">]</span>           <span class="cmt">← dropdown acting as toggle</span>
+
+<span class="kw">#</span>Magic <span class="kw">?</span> <span class="str">UsesMagic</span><span class="pun">=</span><span class="typ">Yes</span>        <span class="cmt">← whole category hidden if No</span>
+
+<span class="kw">##</span>Abilities
+<span class="str">Primary Magic</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+<span class="str">Mana Pool</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span>
+
+<span class="kw">##</span>Advanced <span class="kw">?</span> <span class="str">UsesMagic</span><span class="pun">=</span><span class="typ">Yes</span>    <span class="cmt">← section-level conditional</span>
+<span class="str">Arcane Theory</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">]</span>
+</code></pre>
+
+        <div class="callout">
+          <strong>Note</strong>
+          Conditions use <strong>exact string matching</strong>. <code>UsesMagic=true</code> and <code>UsesMagic=True</code> are different. Match the case of the dropdown option or text value precisely.
+        </div>
+      </section>
+
+      <!-- ─── HINTS ─── -->
+      <section id="hints">
+        <h2><span class="section-num">14</span> Field Hints</h2>
+        <p>Add a placeholder hint text to any field by appending a quoted string after the closing bracket.</p>
+        <pre><code><span class="str">Backstory</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">]</span> <span class="str">"Where did they come from?"</span>
+<span class="str">Nickname</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span> <span class="str">"What do allies call them?"</span>
+<span class="str">Power Level</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span> <span class="str">"Approx. 1–100"</span>
+</code></pre>
+        <p>Hints appear as grey placeholder text inside the input and disappear when the user starts typing.</p>
+      </section>
+
+      <!-- ─── COMMENTS ─── -->
+      <section id="comments">
+        <h2><span class="section-num">15</span> Comments</h2>
+        <p>Lines beginning with <code>//</code> are ignored by the parser and can be used for notes.</p>
+        <pre><code><span class="cmt">// This template is for high-fantasy campaigns</span>
+<span class="kw">#</span>Identity
+
+<span class="cmt">// TODO: add Guild reference field later</span>
+<span class="kw">##</span>Basic
+<span class="str">Name</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span>
+</code></pre>
+      </section>
+
+      <!-- ─── QUICK REF ─── -->
+      <section id="quick-ref">
+        <h2><span class="section-num">16</span> Quick Reference</h2>
+        <table>
+          <tr><th>Syntax</th><th>What it does</th></tr>
+          <tr><td>#Name</td><td>New category (tab)</td></tr>
+          <tr><td>##Name</td><td>New section inside category</td></tr>
+          <tr><td>Key: [text]</td><td>Single-line text field</td></tr>
+          <tr><td>Key: [text=default]</td><td>Text with default value</td></tr>
+          <tr><td>Key: [multiline]</td><td>Paragraph textarea</td></tr>
+          <tr><td>Key: [number]</td><td>Numeric input</td></tr>
+          <tr><td>Key: [tags]</td><td>Chip-tag list (unlimited)</td></tr>
+          <tr><td>Key: [tags,N]</td><td>Chip-tag list (max N)</td></tr>
+          <tr><td>Key: [list]</td><td>Ordered item list</td></tr>
+          <tr><td>Key: [list,N]</td><td>Ordered list (max N)</td></tr>
+          <tr><td>Key: [rate]</td><td>Star rating</td></tr>
+          <tr><td>Key: [rate=D,min-max,style]</td><td>Rating with default D, range, and style (star/heart/circle)</td></tr>
+          <tr><td>Key: [A,B,C]</td><td>Dropdown with options A, B, C</td></tr>
+          <tr><td>Key: [@character]</td><td>Single character reference</td></tr>
+          <tr><td>Key: [@characters,N]</td><td>Multi-character ref (max N)</td></tr>
+          <tr><td>Key: [@location]</td><td>Single location reference</td></tr>
+          <tr><td>Key: [@locations,N]</td><td>Multi-location ref (max N)</td></tr>
+          <tr><td>Key: [@item]</td><td>Single item reference</td></tr>
+          <tr><td>Key: [@items,N]</td><td>Multi-item ref (max N)</td></tr>
+          <tr><td>Key: [type] "hint text"</td><td>Field with placeholder hint</td></tr>
+          <tr><td>#Cat ? Field=value</td><td>Conditional category</td></tr>
+          <tr><td>##Sec ? Field=value</td><td>Conditional section</td></tr>
+          <tr><td>Key: [type] ? Field=value</td><td>Conditional field</td></tr>
+          <tr><td>Extends BaseName</td><td>Inherit from another template (must be first line)</td></tr>
+          <tr><td>// text</td><td>Comment (ignored by parser)</td></tr>
+        </table>
+      </section>
+
+      <!-- ─── FULL EXAMPLE ─── -->
+      <section id="full-example">
+        <h2><span class="section-num">17</span> Full Example Template</h2>
+        <p>A complete, production-style template demonstrating all features together.</p>
+
+        <pre><code><span class="cmt">// DetailedFantasy.weave — extends the basic template</span>
+<span class="kw">Extends</span> <span class="str">BasicFantasy</span>
+
+<span class="kw">#</span>Personality
+
+<span class="kw">##</span>Traits
+<span class="str">Strengths</span><span class="pun">: [</span><span class="typ">tags</span><span class="pun">,</span><span class="str">5</span><span class="pun">]</span> <span class="str">"e.g. Brave, Loyal"</span>
+<span class="str">Flaws</span><span class="pun">: [</span><span class="typ">tags</span><span class="pun">,</span><span class="str">5</span><span class="pun">]</span>
+<span class="str">Alignment</span><span class="pun">: [</span><span class="str">Lawful Good</span><span class="pun">,</span><span class="str">Neutral Good</span><span class="pun">,</span><span class="str">Chaotic Good</span><span class="pun">,</span><span class="str">True Neutral</span><span class="pun">,</span><span class="str">Chaotic Evil</span><span class="pun">]</span>
+
+<span class="kw">#</span>History
+
+<span class="kw">##</span>Background
+<span class="str">Birthplace</span><span class="pun">: [</span><span class="kw">@location</span><span class="pun">]</span>
+<span class="str">Former Mentor</span><span class="pun">: [</span><span class="kw">@character</span><span class="pun">]</span>
+<span class="str">Life Events</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">]</span> <span class="str">"Key moments that shaped them"</span>
+
+<span class="kw">#</span>Relationships
+
+<span class="kw">##</span>Connections
+<span class="str">Allies</span><span class="pun">: [</span><span class="kw">@characters</span><span class="pun">,</span><span class="str">6</span><span class="pun">]</span>
+<span class="str">Enemies</span><span class="pun">: [</span><span class="kw">@characters</span><span class="pun">]</span>
+<span class="str">Love Interest</span><span class="pun">: [</span><span class="kw">@character</span><span class="pun">]</span> <span class="kw">?</span> <span class="str">HasRomance</span><span class="pun">=</span><span class="typ">Yes</span>
+
+<span class="kw">#</span>Equipment
+
+<span class="kw">##</span>Gear
+<span class="str">Signature Weapon</span><span class="pun">: [</span><span class="kw">@item</span><span class="pun">]</span>
+<span class="str">Carried Items</span><span class="pun">: [</span><span class="kw">@items</span><span class="pun">,</span><span class="str">8</span><span class="pun">]</span>
+
+<span class="kw">#</span>Stats
+
+<span class="kw">##</span>Ratings
+<span class="str">Leadership</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">=</span><span class="str">3</span><span class="pun">,</span><span class="str">0-5</span><span class="pun">,</span><span class="str">star</span><span class="pun">]</span>
+<span class="str">Courage</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">,</span><span class="str">1-5</span><span class="pun">,</span><span class="str">heart</span><span class="pun">]</span>
+<span class="str">Arcane Power</span><span class="pun">: [</span><span class="typ">rate</span><span class="pun">=</span><span class="str">0</span><span class="pun">,</span><span class="str">0-10</span><span class="pun">,</span><span class="str">circle</span><span class="pun">]</span> <span class="kw">?</span> <span class="str">UsesMagic</span><span class="pun">=</span><span class="typ">Yes</span>
+
+<span class="kw">#</span>Magic <span class="kw">?</span> <span class="str">UsesMagic</span><span class="pun">=</span><span class="typ">Yes</span>
+
+<span class="kw">##</span>Abilities
+<span class="str">Primary Magic</span><span class="pun">: [</span><span class="typ">text</span><span class="pun">]</span> <span class="str">"e.g. Fire, Illusion"</span>
+<span class="str">Mana Pool</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">=</span><span class="str">100</span><span class="pun">]</span>
+<span class="str">Spells Known</span><span class="pun">: [</span><span class="typ">list</span><span class="pun">,</span><span class="str">10</span><span class="pun">]</span>
+<span class="str">Magic School</span><span class="pun">: [</span><span class="str">Evocation</span><span class="pun">,</span><span class="str">Illusion</span><span class="pun">,</span><span class="str">Necromancy</span><span class="pun">,</span><span class="str">Divination</span><span class="pun">,</span><span class="str">Abjuration</span><span class="pun">]</span>
+
+<span class="kw">##</span>Training
+<span class="str">Teacher</span><span class="pun">: [</span><span class="kw">@character</span><span class="pun">]</span>
+<span class="str">Years Practiced</span><span class="pun">: [</span><span class="typ">number</span><span class="pun">]</span>
+<span class="str">Training Notes</span><span class="pun">: [</span><span class="typ">multiline</span><span class="pun">]</span>
+</code><span class="lang-tag">DetailedFantasy.weave</span></pre>
+
+        <a href="#top" class="back-top">↑ Back to top</a>
+      </section>
+
+    </div><!-- .content -->
+  </main>
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>
