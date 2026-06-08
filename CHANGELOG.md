@@ -13,3 +13,6 @@ All notable changes to this project will be documented in this file.
 ### Known Bugs
 
 ### Future Features
+*Dropbox support
+*Author Studio Standalone
+*
